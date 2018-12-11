@@ -5,7 +5,6 @@ library(DESeq2)
 library(readr)
 library(magrittr)
 library('AnnotationDbi')
-library('gplots')
 library('calibrate')
 library("RColorBrewer")
 library(ggplot2)
@@ -33,9 +32,6 @@ design =~ Group
 contrast <- c('Group','Early','Late')
 
 
-#PCA_Group <- 'Time'
-#design =~ Time 
-#contrast <- c('Time','0','120d')
 
 
 tx2gene <- read.table('hg38/IDs', header=T, sep="\t", stringsAsFactors = F)
@@ -43,7 +39,7 @@ tx2gene <- read.table('hg38/IDs', header=T, sep="\t", stringsAsFactors = F)
 metadata <- read.table('meta', header = T, sep="\t", stringsAsFactors = T)
 
 meta <- metadata %>% dplyr::filter(Group %in% c('Late', 'Early'))
-#
+
 
 
 
@@ -95,16 +91,22 @@ keep <- rowSums(counts(dds) >= 10) >= 3
 dds <- dds[keep,] # filter them out
 
 
-#library(locfit)
-# Do DE analysis 
 dds <- DESeq(dds)
 
-#resultsNames(dds)
-res<-results(dds)
-#res<-results(dds, contrast=contrast)
+res<-results(dds, contrast=contrast)
 res<-res[order(res$padj),]
 res <- as.data.frame(res)
 head(res)
+
+
+
+
+my_concat <- function(x){paste(x, sep="|", collapse="|")}
+
+# Organism
+library('org.Hs.eg.db')
+orgDB <- org.Hs.eg.db
+
 
 # Get gene names
 res$Gene <- mapIds(orgDB, keys=row.names(res), column='SYMBOL', keytype='ENSEMBL', multiVals=my_concat)
@@ -116,11 +118,6 @@ res$Gene[idx] <- res$ID[idx]
 idx <- which(res$Gene == 'NA')  # mapIDs with my_concat can return "NA", not NA
 res$Gene[idx] <- res$ID[idx]
 
-
-# Plot counts of most significant, to check if fold change is right
-png(paste0(outDir, '/',outPrefix,'_sanity.check.png'))
-plotCounts(dds, gene=res[1,]$ID, intgroup = PCA_Group, main=res[1,]$Gene, pch=19)
-dev.off()
 
 # Write Results
 outResults <- data.frame(GeneID=res$ID, Gene=res$Gene, baseMean=res$baseMean, log2FoldChange=res$log2FoldChange, pvalue=res$pvalue, padj=res$padj)
@@ -135,11 +132,24 @@ write.table(resTable,file=paste(outDir, "/", outPrefix, "_significant.txt", sep=
 
 
 
+##########  Sanity Check
+# Plot counts of most significant, to check if fold change is right
+png(paste0(outDir, '/',outPrefix,'_sanity.check.png'))
+plotCounts(dds, gene=res[1,]$ID, intgroup = PCA_Group, main=res[1,]$Gene, pch=19)
+dev.off()
+
 #########  MA Plot   #########
 
 name <- paste(outDir, '/', outPrefix, '_MAplot.png', sep="") 
 png(name)
 plotMA(dds)
+dev.off()
+
+name <- paste(outDir, '/', outPrefix, '_MA_20.png', sep="") 
+png(name)
+res[1:20,] %>% ggplot(aes(x=baseMean,y=log2FoldChange)) + geom_point() + 
+			geom_text_repel(aes(label=Genus)) + 
+			scale_x_log10() + geom_hline(yintercept=0, color='black') +  theme_bw()
 dev.off()
 
 
@@ -184,14 +194,25 @@ print(p)
 dev.off()
 
 
-#name <- paste(outDir, '/', outPrefix, '_PCA_shapes.png', sep="") 
-#png(name,width=1400, height=1100)
-#pca <- plotPCA(vsd, intgroup=c(PCA_Group), returnData=T)
-#ggplot(pca, aes(x=PC1, y=PC2, shape=Time, color=Time)) + scale_shape_manual(values=1:11) + geom_point(size=6, stroke=1) 
-#dev.off()
 
+pcaData <- plotPCA(vsd, intgroup=PCA_Group, returnData=TRUE)
+pcaData$f <- colData(dds)$File
+pcaData$Location <- colData(dds)$Location
+pcaData$BMI <- colData(dds)$BMI
+pcaData$Name <- colData(dds)$PS
+pcaData$Patient <- colData(dds)$Patient
 
-#
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+name <- paste(outDir, '/', outPrefix, '_PCA_shape.png', sep="") 
+png(name)
+ggplot(pcaData, aes(PC1, PC2, color=Patient, shape=Location)) +
+	geom_point(aes(size=BMI)) +
+	xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+	ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+	geom_text_repel(aes(x=PC1, y=PC2, label=Patient), point.padding = unit(2,"points")) +
+		coord_fixed()
+dev.off()
 
 
 ########### Heatmap
@@ -225,7 +246,7 @@ m <- as.matrix(m)
 hmcol <- colorRampPalette(brewer.pal(9, "GnBu"))(100)
 
 name <- paste(outDir, '/', outPrefix, '_heat.png', sep="") 
-png(name, height = 650)
+png(name, height = 850, width=1200)
 #tiff(file=name, width=1500, height=2100, units='px', res=300)
 heatmap.2(m, col=hmcol, dendrogram='column', trace='none', margin=c(10,6), density.info='none', Colv=T, Rowv=F)
 dev.off()
@@ -253,6 +274,5 @@ legend("topleft", legend = c("FDR<0.05", "|LFC|>2", "both"), pch = 16, col = c("
 #with(subset(res, padj < 0.05), textxy(log2FoldChange, -log10(pvalue), labs = Gene, cex = 1))
 
 dev.off()
-
 
 }
