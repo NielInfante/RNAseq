@@ -32,6 +32,11 @@ ranks <- deframe(res2)
 head(ranks, 20)
 
 
+# Get pathways from:
+#http://software.broadinstitute.org/gsea/downloads.jsp
+#http://software.broadinstitute.org/gsea/msigdb/index.jsp
+
+
 pathways.hallmark <- gmtPathways("data/h.all.v6.2.symbols.gmt")
 
 # Show the first few pathways, and within those, show only the first few genes. 
