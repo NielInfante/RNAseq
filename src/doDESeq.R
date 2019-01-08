@@ -98,6 +98,8 @@ res<-res[order(res$padj),]
 res <- as.data.frame(res)
 head(res)
 
+# Save dds
+saveRDS(dds, paste0(outDir, '/', outPrefix, '_dds.rds'))
 
 
 
