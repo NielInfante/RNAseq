@@ -122,7 +122,7 @@ res$Gene[idx] <- res$ID[idx]
 
 
 # Write Results
-outResults <- data.frame(GeneID=res$ID, Gene=res$Gene, baseMean=res$baseMean, log2FoldChange=res$log2FoldChange, pvalue=res$pvalue, padj=res$padj)
+outResults <- data.frame(GeneID=res$ID, Gene=res$Gene, baseMean=res$baseMean, stat=res$stat, log2FoldChange=res$log2FoldChange, pvalue=res$pvalue, padj=res$padj)
 name <- paste(outDir, '/', outPrefix, '_results.txt', sep="") 
 write.table(outResults, file=name, sep="\t", quote=F, row.names=F)
 
