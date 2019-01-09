@@ -129,7 +129,7 @@ write.table(outResults, file=name, sep="\t", quote=F, row.names=F)
 # Significant genes
 r2 <- res[!(is.na(res$padj)),]
 resSig <- r2[ r2$padj < 0.05, ]
-resTable <- data.frame(GeneID=row.names(resSig), Gene=resSig$Gene, baseMean=resSig$baseMean, log2FoldChange=resSig$log2FoldChange, pvalue=resSig$pvalue, padj=resSig$padj)
+resTable <- data.frame(GeneID=row.names(resSig), Gene=resSig$Gene, baseMean=resSig$baseMean, stat=resSig$stat, log2FoldChange=resSig$log2FoldChange, pvalue=resSig$pvalue, padj=resSig$padj)
 write.table(resTable,file=paste(outDir, "/", outPrefix, "_significant.txt", sep=""), sep="\t", quote=F, row.names=F)
 
 
