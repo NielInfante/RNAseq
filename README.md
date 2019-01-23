@@ -4,6 +4,9 @@ Template for basic RNA seq analysis
 
 ## Steps:
 
+Steps that have been done are marked with a  :white_check_mark: while those that have yet to be started are marking with a  :x:. Steps in progress are marked by a :large_orange_diamond:.
+
+
 ### Quality Control
 In the reads folder, create a fastqc folder. Then run:
 
