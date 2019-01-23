@@ -21,17 +21,21 @@ multiqc -o multiqc .
 
 Usually quality is good enough to proceed without any trimming, but do make note of the total read numbers, to see if any samples are too low, or there are outliers.
 
-### Quantification
+### :x: <!--:large_orange_diamond: :white_check_mark:--> Quantification
 
 Download the appropriate transcripts and build a salmon index
 
 In the reads folder, use salmon to quantify each read
 
-### Differential expression
+### :x: <!--:large_orange_diamond: :white_check_mark:--> Differential expression
 
 Use the R script doDESeq.R to find differentially expressed genes, and produce some figures
 
-### GO Analysis
+### :x: <!--:large_orange_diamond: :white_check_mark:--> Emperor
 
-### Pathway Analysis
+Create an interactive PCA to explore the data
+
+### :x: <!--:large_orange_diamond: :white_check_mark:--> GO Analysis
+
+### :x: <!--:large_orange_diamond: :white_check_mark:--> Pathway Analysis
 
