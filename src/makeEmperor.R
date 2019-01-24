@@ -1,71 +1,70 @@
-<<<<<<< HEAD
 library(DESeq2)
-dds <- readRDS(file='~/depot/projects/Pistilli/Pistilli_2019_01/deseq/All_dds.rds')
+
+# Files
+inputFile <- ''  # dds as rds
+outputFileMain <- ''   # Will append _pca.dat 
+
+# Number of Principal Components you want in the final output
+numberPCs <- 5
+
+# Read dds
+dds <- readRDS(file=inputFile)
 
 vsd <- vst(dds, blind=F)
 res<-results(dds)
 res <- as.data.frame(res)
 
 
-
-=======
->>>>>>> 2fa6b21439b8173f68a9a7bd1dcfa752967ab92b
-
 # Get most expressed genes
 topExp <- res[order(res$baseMean, decreasing=T)[1:500],]$ID
 
-vsd$SampleID
+# Get normalized counts, arrange data
 a <- as.data.frame(assay(vsd))
-
 a <- a[topExp,]
 dim(a)
 names(a) <- vsd$SampleID
 a <- t(a)
 
-
+# Do the PCA
 t1 <- prcomp(a, center = T, scale. = T)
 
 
-summary(t1)
+# Get coordinates that you want
+coords <- as.data.frame(t1$x[,1:numberPCs])
 
 
-str(t1)
-dim(t1$x)
+coords$Name <- row.names(coords)
+coords <- coords[c(numberPCs+1,1:numberPCs)]
+names(coords)[1] <- 'pc vector number'
 
-coords <- as.data.frame(t1$x[,1:3])
-
-
-
-write.table(coords, file='~/depot/projects/Pistilli/Pistilli_2019_01/emperor/pca.dat',
-						quote=F, sep="\t",row.names = T)
-
-# add "pc vector number" to header manually
+write.table(coords, file=paste0(outputFileMain, '_pca.dat'), quote=F, sep="\t",row.names = F)
 
 
-
+# Get variation explained and eigenvalues
 varexp <- t1$sdev^2 / sum(t1$sdev^2)
-varexp <- c('% variation explained', varexp[1:3])
+varexp <- c('% variation explained', varexp[1:numberPCs])
 
-
-eigenvals <- (t1$sdev ^ 2)[1:3] 
+eigenvals <- (t1$sdev ^ 2)[1:numberPCs] 
 
 eig <- c('eigvals',eigenvals)
 
+# Add data to table
+cat('\n\n', 
+		paste0(eig, collapse='\t'), '\n',
+		paste0(varexp, collapse='\t'),
+		file=paste0(outputFileMain, '_pca.dat'),'\n', append=T)
 
-meta <- data.frame(SampleID=vsd$SampleID, Surgeon=vsd$Surgeon, Group=vsd$Group, 
-									 Run=vsd$Run, Cancer=vsd$Cancer, EdName=vsd$EdName)
 
-write.table(meta, file='~/depot/projects/Pistilli/Pistilli_2019_01/emperor/meta.dat',
-						quote=F, sep="\t",row.names = F)
+####  Step to be done manually  #####
 
-
-# Add # to header manually
+# Copy metadata file, add # to header
+# The first column should be #SampleID
 
 
 
 # On the command line,
 # conda activate emperor
-# make_emperor.py -i pca.dat -m meta.dat
+# make_emperor.py -i pca.dat -m meta.dat -o outdir
 # conda deactivate
 
 
