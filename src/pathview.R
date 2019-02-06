@@ -1,4 +1,4 @@
-# Pathways for Ma
+# Pathways for Raj
 
 library(pathview)
 library(gage)
@@ -6,13 +6,13 @@ library(gageData)
 library(biomaRt)
 library(dplyr)
 library("AnnotationDbi")
-library("org.Hs.eg.db")
+library("org.Rn.eg.db")
 #columns(org.Hs.eg.db)
 
-data(kegg.sets.hs)
-data(sigmet.idx.hs)
-kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
-head(kegg.sets.hs, 3)
+data(kegg.sets.rn)
+data(sigmet.idx.rn)
+kegg.sets.rn = kegg.sets.rn[sigmet.idx.rn]
+head(kegg.sets.rn, 3)
 
 #doPathways('PD-HOBvLTMC')
 
@@ -53,7 +53,7 @@ write.table(out, file=paste0(prefix,'down.txt'), col.names=T, row.names=F, sep="
 # Make pretty pictures
 
 # Define plotting function for applying later
-plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa", new.signature=FALSE)
+plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="rno", new.signature=FALSE)
 
 
 # do Up
@@ -71,7 +71,7 @@ keggresids = substr(keggrespathways, start=1, stop=8)
 
 # plot multiple pathways (plots saved to disk and returns a throwaway list object)
 #detach("package:dplyr", unload=TRUE)
-tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa"))
+tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="rno"))
 
 
 # do Down
@@ -90,7 +90,7 @@ keggresids = substr(keggrespathways, start=1, stop=8)
 
 # plot multiple pathways (plots saved to disk and returns a throwaway list object)
 #detach("package:dplyr", unload=TRUE)
-tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="hsa"))
+tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="rno"))
 
 }
 
