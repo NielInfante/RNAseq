@@ -8,12 +8,14 @@ my %data = ();
 
 open (inFile, $ARGV[0]) || die "Can't open file $!\n";
 
-thirdTry();
+#from_GTF();
+from_fa();
+
 
 close inFile;
 
 
-sub thirdTry{
+sub from_GTF{
 	while (my $line = <inFile>){
 		next unless ($line =~ /^\>([\w-.]*)\s+/);     # Don't want sequence lines
 
@@ -26,3 +28,11 @@ sub thirdTry{
 	}
     }
 }
+
+sub from_fa{
+	while (my $line = <inFile>){
+		next unless ($line =~ /^\>([\w-.]*).*gene:(\w+)/);
+		print "$1\t$2\n"
+	}
+}
+
