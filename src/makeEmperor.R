@@ -13,7 +13,7 @@ dds <- readRDS(file=inputFile)
 vsd <- vst(dds, blind=F)
 res<-results(dds)
 res <- as.data.frame(res)
-
+res$ID <- row.names(res)
 
 # Get most expressed genes
 topExp <- res[order(res$baseMean, decreasing=T)[1:500],]$ID
