@@ -1,6 +1,7 @@
 # Pics for Linda
 
 library(tidyverse)
+library(RColorBrewer)
 
 setwd('~/depot/projects/Davis/Nov_2018/')
 
@@ -77,6 +78,29 @@ png(name, height = 650)
 #tiff(file=name, width=1500, height=2100, units='px', res=300)
 heatmap.2(m, col=hmcol, dendrogram='column', trace='none', margin=c(10,6), density.info='none', Colv=T, Rowv=F)
 dev.off()
+
+
+
+#### Pheatmap
+
+library(genefilter)
+library(DESeq2)
+library(tidyverse)
+library(pheatmap)
+
+dds <- readRDS('~/depot/projects/Kovinich/Kovinich_2019_01/deseq/H2O_MYB29A2_vs_pGWB2_dds.rds')
+rld <- rlogTransformation(dds)
+
+topVarGenes <- head(order(-rowVars(assay(rld))),20)
+
+
+mat <- assay(rld)[ topVarGenes, ]
+mat <- mat - rowMeans(mat)
+df <- as.data.frame(colData(rld)[,c("Group","Treatment")])
+rownames(df) <- colData(rld)[,c('SampleID')]
+colnames(mat) <- colData(rld)[,c('SampleID')]
+
+pheatmap(mat, annotation_col=df, cutree_rows = 3, cutree_cols = 2)
 
 
 
