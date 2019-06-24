@@ -97,6 +97,8 @@ topVarGenes <- head(order(-rowVars(assay(rld))),20)
 mat <- assay(rld)[ topVarGenes, ]
 mat <- mat - rowMeans(mat)
 df <- as.data.frame(colData(rld)[,c("Group","Treatment")])
+
+# Need the same names in both the df and the matrix
 rownames(df) <- colData(rld)[,c('SampleID')]
 colnames(mat) <- colData(rld)[,c('SampleID')]
 
