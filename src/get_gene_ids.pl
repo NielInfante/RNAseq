@@ -2,7 +2,6 @@
 use strict;
 
 # script to read a cDNA file, and pair transcript and gene IDs
-# Some edit
 
 
 my %data = ();
